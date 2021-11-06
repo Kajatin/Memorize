@@ -8,11 +8,15 @@
 import SwiftUI
 
 struct ContentView: View {
-    var emojis = ["🐳", "🦖", "🦉", "🐙", "🐶", "🐼", "🐹", "🐷", "🐵", "🐴", "🐛", "🐞", "🐌", "🐝", "🐢", "🦑", "🦀", "🐡", "🦣", "🦌", "🦚", "🦫", "🦥", "🦔"]
+    var themes = ["pawprint", "car", "fork.knife"]
+    var descriptions = ["Animals", "Vehicles", "Food"]
+    @State var emojis = ["🐳", "🦖", "🦉", "🐙", "🐶", "🐼", "🐹", "🐷", "🐵", "🐴", "🐛", "🐞", "🐌", "🐝", "🐢", "🦑", "🦀", "🐡", "🦣", "🦌", "🦚", "🦫", "🦥", "🦔"]
     @State var emojiCount = 10
 
     var body: some View {
         VStack {
+            Text("Memorize").font(.largeTitle)
+            Spacer(minLength: 20)
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 80, maximum: 100))]) {
                     ForEach(emojis[0..<emojiCount], id: \.self) { emoji in
@@ -22,32 +26,14 @@ struct ContentView: View {
             }
             Spacer()
             HStack {
-                remove
-                Spacer()
-                add
+                LazyVGrid(columns: [GridItem(), GridItem(), GridItem()]) {
+                    ForEach(0..<themes.count) { idx in
+                        ThemeButtonView(theme: themes[idx], text: descriptions[idx], emojis: $emojis, emojiCount: $emojiCount)
+                    }
+                }
             }
-            .font(.largeTitle)
-            .padding(.horizontal)
         }
         .padding(.horizontal)
-    }
-    
-    var remove: some View {
-        Button {
-            emojiCount -= 1
-        } label: {
-            Image(systemName: "minus.circle")
-        }
-        .disabled(emojiCount <= 0)
-    }
-    
-    var add: some View {
-        Button {
-            emojiCount += 1
-        } label: {
-            Image(systemName: "plus.circle")
-        }
-        .disabled(emojiCount >= emojis.count)
     }
 }
 
@@ -69,6 +55,37 @@ struct CardView: View {
         }
         .onTapGesture {
             isFaceUp = !isFaceUp
+        }
+    }
+}
+
+struct ThemeButtonView: View {
+    var theme: String
+    var text: String
+    @Binding var emojis: [String]
+    @Binding var emojiCount: Int
+    
+    var body: some View {
+        Button {
+            switch theme {
+            case "pawprint":
+                self.emojis = ["🐳", "🦖", "🦉", "🐙", "🐶", "🐼", "🐹", "🐷", "🐵", "🐴", "🐛", "🐞", "🐌", "🐝", "🐢", "🦑", "🦀", "🐡", "🦣", "🦌", "🦚", "🦫", "🦥", "🦔"].shuffled()
+                self.emojiCount = Int.random(in: 8..<self.emojis.count)
+            case "car":
+                self.emojis = ["🚗", "🚕", "🚙", "🚌", "🏎", "🚓", "🚑", "🛴", "🚲", "🚆", "✈️", "🚀", "🚁", "⛵️", "🚜", "🚛", "🚔", "🚍", "🛶", "🛺", "🚚", "🦽", "🚊", "🛸"].shuffled()
+                self.emojiCount = Int.random(in: 8..<self.emojis.count)
+            case "fork.knife":
+                self.emojis = ["🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍓", "🍑", "🍍", "🍅", "🍆", "🥝", "🌽", "🥕", "🧄", "🥐", "🥨", "🧀", "🍗", "🥓", "🌮", "🌯", "🍔", "🧇"].shuffled()
+                self.emojiCount = Int.random(in: 8..<self.emojis.count)
+            default:
+                self.emojis = ["🐳", "🦖", "🦉", "🐙", "🐶", "🐼", "🐹", "🐷", "🐵", "🐴", "🐛", "🐞", "🐌", "🐝", "🐢", "🦑", "🦀", "🐡", "🦣", "🦌", "🦚", "🦫", "🦥", "🦔"]
+                self.emojiCount = Int.random(in: 8..<self.emojis.count)
+            }
+        } label: {
+            VStack {
+                Image(systemName: theme).font(.largeTitle)
+                Text(text).font(.body)
+            }
         }
     }
 }
