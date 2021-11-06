@@ -8,10 +8,9 @@
 import SwiftUI
 
 struct ContentView: View {
+    @ObservedObject var viewModel: EmojiMemoryGame
     var themes = ["pawprint", "car", "fork.knife"]
     var descriptions = ["Animals", "Vehicles", "Food"]
-    @State var emojis = ["🐳", "🦖", "🦉", "🐙", "🐶", "🐼", "🐹", "🐷", "🐵", "🐴", "🐛", "🐞", "🐌", "🐝", "🐢", "🦑", "🦀", "🐡", "🦣", "🦌", "🦚", "🦫", "🦥", "🦔"]
-    @State var emojiCount = 10
 
     var body: some View {
         VStack {
@@ -19,8 +18,12 @@ struct ContentView: View {
             Spacer(minLength: 20)
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 80, maximum: 100))]) {
-                    ForEach(emojis[0..<emojiCount], id: \.self) { emoji in
-                        CardView(content: emoji).aspectRatio(2/3, contentMode: .fit)
+                    ForEach(viewModel.cards) { card in
+                        CardView(card: card)
+                            .aspectRatio(2/3, contentMode: .fit)
+                            .onTapGesture {
+                                viewModel.choose(card)
+                            }
                     }
                 }
             }
@@ -28,7 +31,7 @@ struct ContentView: View {
             HStack {
                 LazyVGrid(columns: [GridItem(), GridItem(), GridItem()]) {
                     ForEach(0..<themes.count) { idx in
-                        ThemeButtonView(theme: themes[idx], text: descriptions[idx], emojis: $emojis, emojiCount: $emojiCount)
+//                        ThemeButtonView(theme: themes[idx], text: descriptions[idx], emojis: $emojis, emojiCount: $emojiCount)
                     }
                 }
             }
@@ -38,23 +41,19 @@ struct ContentView: View {
 }
 
 struct CardView: View {
-    @State var isFaceUp: Bool = false
-    var content: String
-
+    let card: MemoryGame<String>.Card
+    
     var body: some View {
         ZStack {
-            if isFaceUp {
+            if card.isFaceUp {
             RoundedRectangle(cornerRadius: 20)
                 .strokeBorder(lineWidth: 3)
                 .foregroundColor(.indigo)
-            Text(content).font(.largeTitle)
+            Text(card.content).font(.largeTitle)
             } else {
                 RoundedRectangle(cornerRadius: 20)
                     .fill(.linearGradient(Gradient(colors: [.indigo, .purple]), startPoint: .top, endPoint: .bottom))
             }
-        }
-        .onTapGesture {
-            isFaceUp = !isFaceUp
         }
     }
 }
@@ -91,8 +90,10 @@ struct ThemeButtonView: View {
 }
 
 struct ContentView_Previews: PreviewProvider {
+    static let game = EmojiMemoryGame()
+    
     static var previews: some View {
-        ContentView()
+        ContentView(viewModel: game)
             .preferredColorScheme(.dark)
     }
 }
