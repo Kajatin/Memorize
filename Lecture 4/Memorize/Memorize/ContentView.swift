@@ -45,14 +45,14 @@ struct CardView: View {
     
     var body: some View {
         ZStack {
+            let shape = RoundedRectangle(cornerRadius: 20)
             if card.isFaceUp {
-            RoundedRectangle(cornerRadius: 20)
-                .strokeBorder(lineWidth: 3)
-                .foregroundColor(.indigo)
-            Text(card.content).font(.largeTitle)
+                shape.strokeBorder(lineWidth: 3).foregroundColor(.indigo)
+                Text(card.content).font(.largeTitle)
+            } else if card.isMatched {
+                shape.opacity(0)
             } else {
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(.linearGradient(Gradient(colors: [.indigo, .purple]), startPoint: .top, endPoint: .bottom))
+                shape.fill(.linearGradient(Gradient(colors: [.indigo, .purple]), startPoint: .top, endPoint: .bottom))
             }
         }
     }
